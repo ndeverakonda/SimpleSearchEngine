@@ -2,10 +2,11 @@ package org.example;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class App {
-    static Scanner sc = new Scanner(System.in);
+    static Scanner sc = new Scanner(System.in, StandardCharsets.UTF_8.name());
 
     public static Map<String, Set<Integer>> buildIndex(String[][] inp, int N) {
         Map<String, Set<Integer>> index = new HashMap<>();
@@ -14,7 +15,7 @@ public class App {
                 String field = inp[i][j];
                 if (field == null || field.isEmpty()) continue;
 
-                String[] words = field.toLowerCase().split(" ");
+                String[] words = field.toLowerCase(Locale.ROOT).split(" ");
                 for (String word : words) {
                     if (word.isEmpty()) continue;
                     index.putIfAbsent(word, new HashSet<>());
@@ -55,7 +56,7 @@ public class App {
 
     public static Set<Integer> getAnyMatches(String queryLine, Map<String, Set<Integer>> index) {
         Set<Integer> result = new HashSet<>();
-        String[] words = queryLine.toLowerCase().trim().split(" ");
+        String[] words = queryLine.toLowerCase(Locale.ROOT).trim().split(" ");
 
         for (String w : words) {
             if (w.isEmpty()) continue;
@@ -66,7 +67,7 @@ public class App {
     }
 
     public static Set<Integer> getAllMatches(String queryLine, Map<String, Set<Integer>> index) {
-        String[] words = queryLine.toLowerCase().trim().split(" ");
+        String[] words = queryLine.toLowerCase(Locale.ROOT).trim().split(" ");
 
         Set<Integer> result = null; // start null, then intersect
         for (String w : words) {
@@ -99,7 +100,7 @@ public class App {
 
     public static void searchPpl(String[][] inp, int N, Map<String, Set<Integer>> index) {
         System.out.println("Select a matching strategy: ALL, ANY, NONE");
-        String strategy = sc.nextLine().trim().toUpperCase();
+        String strategy = sc.nextLine().trim().toUpperCase(Locale.ROOT);
 
         System.out.println("Enter a name or email to search all suitable people.");
         String queryLine = sc.nextLine();
@@ -134,7 +135,7 @@ public class App {
 
         // Count lines
         int N = 0;
-        Scanner counter = new Scanner(fl);
+        Scanner counter = new Scanner(fl, StandardCharsets.UTF_8.name());
         while (counter.hasNextLine()) {
             String line = counter.nextLine().trim();
             if (!line.isEmpty()) N++;
@@ -143,7 +144,7 @@ public class App {
 
         // Read into array
         String[][] inp = new String[N][3];
-        Scanner scanner = new Scanner(fl);
+        Scanner scanner = new Scanner(fl, StandardCharsets.UTF_8.name());
 
         int i = 0;
         while (scanner.hasNextLine() && i < N) {

@@ -3,8 +3,11 @@ package org.example;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -23,9 +26,14 @@ class AppTest {
         return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
+    private void setScannerInput(String input) {
+        App.sc = new Scanner(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+    }
+
     @AfterEach
     void restoreStdout() {
         System.setOut(originalOut);
+        App.sc = new Scanner(new ByteArrayInputStream(new byte[0]));
         out.reset();
     }
 
@@ -198,5 +206,69 @@ class AppTest {
         assertTrue(outText.contains("Jane Doe jane@mail.com"));
         assertTrue(outText.contains("John Doe"));
         assertTrue(outText.contains("Alice Johnson"));
+    }
+
+    // -------------------------
+    // searchPpl()
+    // -------------------------
+
+    @Test
+    void searchPpl_supportsAllAnyNoneAndDefaultStrategies() {
+        captureStdout();
+        String[][] inp = samplePeople();
+        Map<String, Set<Integer>> index = App.buildIndex(inp, 4);
+
+        setScannerInput("ALL\njohn doe\n");
+        App.searchPpl(inp, 4, index);
+
+        setScannerInput("ANY\ndoe\n");
+        App.searchPpl(inp, 4, index);
+
+        setScannerInput("NONE\njohn\n");
+        App.searchPpl(inp, 4, index);
+
+        setScannerInput("UNKNOWN\njohn\n");
+        App.searchPpl(inp, 4, index);
+
+        String outText = stdout();
+        assertTrue(outText.contains("1 persons found:"));
+        assertTrue(outText.contains("2 persons found:"));
+        assertTrue(outText.contains("0 persons found:"));
+    }
+
+    // -------------------------
+    // main()
+    // -------------------------
+
+    @Test
+    void main_returnsImmediatelyWhenDataArgMissing() throws Exception {
+        captureStdout();
+        App.main(new String[]{});
+        assertEquals("", stdout());
+    }
+
+    @Test
+    void main_coversMenuAndParsesInputFile() throws Exception {
+        captureStdout();
+
+        Path dataFile = Files.createTempFile("people-", ".txt");
+        String content = ""
+                + "John Smith john.smith@mail.com\n"
+                + "\n"
+                + "Jane Doe\n"
+                + "Solo\n";
+        Files.write(dataFile, content.getBytes(StandardCharsets.UTF_8));
+
+        setScannerInput("9\n2\n1\nANY\njohn\n0\n");
+        App.main(new String[]{"--data", dataFile.toString()});
+
+        String outText = stdout();
+        assertTrue(outText.contains("Incorrect option! Try again."));
+        assertTrue(outText.contains("=== List of people ==="));
+        assertTrue(outText.contains("John Smith john.smith@mail.com"));
+        assertTrue(outText.contains("Jane Doe"));
+        assertTrue(outText.contains("Solo "));
+        assertTrue(outText.contains("persons found:"));
+        assertTrue(outText.contains("Bye!"));
     }
 }

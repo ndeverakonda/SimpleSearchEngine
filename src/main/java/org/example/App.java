@@ -52,7 +52,7 @@ public class App {
         return null;
     }
 
-    // -------- Strategy Search Helpers (minimal additions) --------
+    //Strategy Search Helpers
 
     public static Set<Integer> getAnyMatches(String queryLine, Map<String, Set<Integer>> index) {
         Set<Integer> result = new HashSet<>();

@@ -94,7 +94,7 @@ public class App {
         Set<Integer> result = new HashSet<>();
         for (int i = 0; i < N; i++) result.add(i);
 
-        result.removeAll(any);
+        result.removeAll(any); //NONE= WHOLE SET - ANY
         return result;
     }
 

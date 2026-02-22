@@ -78,10 +78,10 @@ public class App {
                 return new HashSet<>(); // one word missing => no ALL match
             }
 
-            if (result == null) {
-                result = new HashSet<>(rows);
+            if (result == null) { //IF FIRST WORD YOU'RE SEARCHING, CREATE ANEW MAP
+                result = new HashSet<>(rows); 
             } else {
-                result.retainAll(rows);
+                result.retainAll(rows); // IF NOT PERFORM AND OPERATION
             }
         }
 
